@@ -7,6 +7,7 @@
 #include <ctime>
 #include <math.h>
 #include <GL/glut.h> 
+#include <random>
 
 #define PIE 3.141529
 using namespace std;
