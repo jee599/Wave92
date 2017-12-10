@@ -10,4 +10,10 @@
 
 #define PIE 3.141529
 using namespace std;
-#pragma once
+
+struct Point
+{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+};
