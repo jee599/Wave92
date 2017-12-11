@@ -7,12 +7,16 @@ enum DIR {DOWN, UP};
 #define MAPSIZE_H 350
 #define MAPSIZE_W 450
 #define MAPSIZE_D 600
-#define VIEWANGLE 60
-#define DELAY 10
-#define STARNUM 5000
+
+const int VIEWANGLE = 60;
+const int DELAY = 10;
+const int STARNUM = 1000;
 
 // 전역 변수
 
+float ConeY;
+float Speed;
+float T;
 bool Direction;
 Point Color[COLOR];
 
@@ -49,7 +53,11 @@ public:
 		glPushMatrix();
 		for(int i = 0; i < STARNUM; ++i)
 		{
-			glTranslatef(Star[i].x, Star[i].y, Star[i].z);
+			Star[i].x -= T;
+			if (Star[i].x < -2000)
+				Star[i].x += 5000;
+			glTranslatef(Star[i].x, Star[i].y - (ConeY/(5000-Star[i].z)), Star[i].z);
+
 			glColor3f(1, 1, 1);
 			glutWireCube(2);
 			glRotatef(90, 1, 0, 1);
@@ -64,9 +72,7 @@ public:
 class Plane
 {
 	float ConeSize;
-	float Angle; 
-	float ConeY;
-	
+	float Angle;
 public:
 	GLvoid ChangeDir()
 	{
@@ -93,6 +99,7 @@ public:
 	{
 		glPushMatrix();
 		{
+			cout << Speed;
 			glTranslatef(-150, ConeY, 0);
 			glRotatef(Angle, 0, 0, 1);
 
@@ -114,25 +121,25 @@ public:
 	{
 		if (Direction)
 		{
-			ConeY+=2;
+			ConeY += Speed;
 			Angle++;
 			if (Angle < 0)
-				Angle += 5;
-			if (Angle > 45)
-				Angle = 45;
-			if (ConeY > 400)
-				ConeY = 400;
+				Angle += 10;
+			if (Angle > 60)
+				Angle = 60;
+			if (ConeY > 500)
+				ConeY = 500;
 		}
 		else
 		{
-			ConeY-=2;
+			ConeY -= Speed;
 			Angle--;
 			if (Angle > 0)
-				Angle -= 5;
-			if (Angle < -45)
-				Angle = -45;
-			if (ConeY < -400)
-				ConeY = -400;
+				Angle -= 10;
+			if (Angle < -60)
+				Angle = -60;
+			if (ConeY < -500)
+				ConeY = -500;
 		}
 	}
 };
@@ -200,10 +207,12 @@ GLvoid Mouse(int Mouse, int Button, int x, int y)
 {
 	if (Mouse == GLUT_LEFT_BUTTON && Button == GLUT_DOWN)
 	{
+		Speed = 0;
 		Direction = UP;
 	}
 	else
 	{
+		Speed = 0;
 		Direction = DOWN;
 	}
 
@@ -211,6 +220,12 @@ GLvoid Mouse(int Mouse, int Button, int x, int y)
 
 GLvoid Timer(int n)
 {
+	Speed += 0.5;
+	if (Speed > 10)
+		Speed = 10;
+	T += 0.01;
+	if (T > 5)
+		T = 5;
 	Manager.Update();
 	glutTimerFunc(DELAY, Timer, 1);
 }
@@ -253,8 +268,8 @@ GLvoid Reshape(int w, int h)
 	gluPerspective(VIEWANGLE, 1, 1, 1000000);
 	
 	gluLookAt(
-		-700, 80, 700,
-		0, 0, 0,
+		-500, 80, 1500,
+		200, 0, 0,
 		0, 1, 0
 	);
 
