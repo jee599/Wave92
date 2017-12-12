@@ -17,6 +17,7 @@ const int STARNUM = 1000;
 float ConeY;
 float Speed;
 float T;
+int Ef;
 bool Direction;
 Point Color[COLOR];
 
@@ -73,7 +74,35 @@ class Plane
 {
 	float ConeSize;
 	float Angle;
+	bool Coll;
 public:
+	GLvoid Tail()
+	{
+
+	}
+	GLvoid CollEffect()	//충돌체크 이펙트
+	{
+		glPushMatrix();
+		if (Ef < 50)	
+		{
+			glColor3f(1, 1, 1);
+			for (int i = 0; i < 10; ++i)
+			{
+				glRotatef(i*36, 1, 0, 0);
+				glTranslatef(Ef, Ef, Ef);
+				glutWireCube(i+5);
+				glTranslatef(-Ef, -Ef, -Ef);
+
+				glRotatef(i * 36, 0, 1, 0);
+				glTranslatef(Ef, Ef, Ef);
+				glutWireCube(i+7);
+				glTranslatef(-Ef, -Ef, -Ef);
+			}
+		}
+		else
+			Ef = 0;
+		glPopMatrix();
+	}
 	GLvoid ChangeDir()
 	{
 		if (Direction)
@@ -89,6 +118,7 @@ public:
 	}
 	GLvoid Init()
 	{
+		Coll = false;
 		Angle = 0;
 		ConeSize = 60;
 		ConeY = 0;
@@ -99,7 +129,6 @@ public:
 	{
 		glPushMatrix();
 		{
-			cout << Speed;
 			glTranslatef(-150, ConeY, 0);
 			glRotatef(Angle, 0, 0, 1);
 
@@ -112,34 +141,39 @@ public:
 
 			// Bounding Box
 			glLineWidth(1);
-			glColor3f(1, 1, 1);
+			glColor3f(1, 0, 0);
 			glTranslatef(0,0,ConeSize);
 			glutWireCube(15);
+			if(Coll)
+				CollEffect();
 		}glPopMatrix();
 	}
 	GLvoid Update()
 	{
-		if (Direction)
+		if (Coll == false)		// 충돌 시엔 안 움직이게
 		{
-			ConeY += Speed;
-			Angle++;
-			if (Angle < 0)
-				Angle += 10;
-			if (Angle > 60)
-				Angle = 60;
-			if (ConeY > 500)
-				ConeY = 500;
-		}
-		else
-		{
-			ConeY -= Speed;
-			Angle--;
-			if (Angle > 0)
-				Angle -= 10;
-			if (Angle < -60)
-				Angle = -60;
-			if (ConeY < -500)
-				ConeY = -500;
+			if (Direction)
+			{
+				ConeY += Speed;
+				Angle++;
+				if (Angle < 0)
+					Angle += 10;
+				if (Angle > 60)
+					Angle = 60;
+				if (ConeY > 500)
+					ConeY = 500;
+			}
+			else
+			{
+				ConeY -= Speed;
+				Angle--;
+				if (Angle > 0)
+					Angle -= 10;
+				if (Angle < -60)
+					Angle = -60;
+				if (ConeY < -500)
+					ConeY = -500;
+			}
 		}
 	}
 };
@@ -220,9 +254,11 @@ GLvoid Mouse(int Mouse, int Button, int x, int y)
 
 GLvoid Timer(int n)
 {
-	Speed += 0.5;
-	if (Speed > 10)
-		Speed = 10;
+	Ef++;
+	Speed += 0.19;
+	if (Speed > 7)
+		Speed = 7;
+
 	T += 0.01;
 	if (T > 5)
 		T = 5;

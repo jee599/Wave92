@@ -2,3 +2,6 @@
 Wave/Wave.VC.VC.opendb
 *.db
 *.idb
+*.db
+*.pdb
+Wave/.vs/Wave/v14/.suo
